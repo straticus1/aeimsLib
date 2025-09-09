@@ -1,6 +1,6 @@
 <?php
 
-namespace AdultToyLib\Protocols;
+namespace AeimsLib\Protocols;
 
 class KiirooProtocol extends BLEProtocol {
     // Kiiroo service UUIDs

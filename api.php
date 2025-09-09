@@ -1,8 +1,8 @@
 <?php
 
-require_once 'adult_toy_library.php';
+require_once 'device_manager.php';
 
-use AdultToyIntegration\DeviceManager;
+use AeimsLib\DeviceManager;
 
 // Initialize application
 $bootstrap = require_once 'bootstrap.php';

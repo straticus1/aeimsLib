@@ -1,6 +1,6 @@
 <?php
 
-namespace AdultToyIntegration;
+namespace AeimsLib;
 
 /**
  * Base class for adult toy device integration

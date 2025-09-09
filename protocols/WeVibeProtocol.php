@@ -1,6 +1,6 @@
 <?php
 
-namespace AdultToyLib\Protocols;
+namespace AeimsLib\Protocols;
 
 class WeVibeProtocol extends BLEProtocol {
     // WeVibe service UUID

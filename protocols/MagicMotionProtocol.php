@@ -1,6 +1,6 @@
 <?php
 
-namespace AdultToyLib\Protocols;
+namespace AeimsLib\Protocols;
 
 class MagicMotionProtocol extends BLEProtocol {
     // Magic Motion service UUIDs

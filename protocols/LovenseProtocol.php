@@ -1,6 +1,6 @@
 <?php
 
-namespace AdultToyLib\Protocols;
+namespace AeimsLib\Protocols;
 
 class LovenseProtocol extends BLEProtocol {
     // Lovense service UUID

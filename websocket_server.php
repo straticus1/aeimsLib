@@ -1,7 +1,7 @@
 <?php
 
 require_once 'vendor/autoload.php';
-require_once 'adult_toy_library.php';
+require_once 'device_manager.php';
 require_once 'config.php';
 
 use Ratchet\MessageComponentInterface;
@@ -9,7 +9,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\WebSocket\WsServer;
 use Ratchet\Http\HttpServer;
 use Ratchet\Server\IoServer;
-use AdultToyIntegration\ButtplugClient;
+use AeimsLib\ButtplugClient;
 
 class WebSocketServer implements MessageComponentInterface {
     private $clients;
@@ -32,7 +32,7 @@ class WebSocketServer implements MessageComponentInterface {
             'ServerInfo' => [
                 'MessageVersion' => 3,
                 'MaxPingTime' => 0,
-                'ServerName' => 'AdultToyLib WebSocket Server'
+'ServerName' => 'AeimsLib WebSocket Server'
             ]
         ]);
     }

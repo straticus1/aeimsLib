@@ -1,6 +1,6 @@
 <?php
 
-namespace AdultToyLib\Protocols;
+namespace AeimsLib\Protocols;
 
 abstract class BLEProtocol {
     protected $deviceName;
