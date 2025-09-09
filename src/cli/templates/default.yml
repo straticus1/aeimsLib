@@ -1,0 +1,61 @@
+# Default aeimsLib Configuration
+
+# WebSocket Server Configuration
+websocket:
+  port: 8080
+  host: localhost
+  path: /ws
+  pingInterval: 30000
+  pingTimeout: 5000
+
+# Security Configuration
+security:
+  encryption:
+    enabled: true
+    algorithm: aes-256-gcm
+    keySize: 32
+    authTagLength: 16
+  authentication:
+    type: jwt
+    tokenExpiration: 3600
+    refreshTokenExpiration: 86400
+  rateLimit:
+    enabled: true
+    windowMs: 60000
+    maxRequests: 100
+    message: "Too many requests, please try again later"
+  audit:
+    enabled: true
+    retention: 30
+    detailLevel: basic
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  interval: 5000
+  retention: 3600000
+  metrics:
+    prefix: aeimslib
+    labels:
+      env: development
+      service: aeimslib
+    types:
+      - device
+      - websocket
+      - system
+  alerts:
+    enabled: true
+    endpoints: []  # Add alert endpoints here
+    thresholds:
+      errorRate: 0.1
+      latency: 2.0
+      deviceErrors: 5
+      connectionDrop: 20
+
+# Device Manager Configuration
+deviceManager:
+  protocols:
+    - websocket
+  autoReconnect: true
+  reconnectInterval: 5000
+  maxReconnectAttempts: 5
