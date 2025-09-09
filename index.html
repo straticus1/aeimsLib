@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult Toy Library Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6f42c1;
+            --secondary-color: #e83e8c;
+            --success-color: #20c997;
+            --warning-color: #fd7e14;
+            --danger-color: #dc3545;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            min-height: calc(100vh - 40px);
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 20px 20px 0 0;
+            padding: 1rem 2rem;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white !important;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            margin-right: 10px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-tabs .nav-link:hover {
+            background: rgba(111, 66, 193, 0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-custom {
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(111, 66, 193, 0.4);
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-disconnected {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .status-error {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .toy-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .intensity-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .intensity-slider:hover {
+            opacity: 1;
+        }
+
+        .intensity-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .pattern-button {
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            border: none;
+            border-radius: 15px;
+            padding: 10px 15px;
+            margin: 5px;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pattern-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+        }
+
+        .alert {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .test-results {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .test-step {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .test-step.passed {
+            background: #d4edda;
+            border-left-color: var(--success-color);
+        }
+
+        .test-step.failed {
+            background: #f8d7da;
+            border-left-color: var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .navbar-custom {
+                padding: 1rem;
+                border-radius: 15px 15px 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <nav class="navbar navbar-custom">
+                <div class="container-fluid">
+                    <span class="navbar-brand">
+                        <i class="fas fa-heart me-2"></i>
+                        Adult Toy Library Management
+                    </span>
+                    <div class="d-flex align-items-center text-white">
+                        <span id="connectionStatus" class="me-3">
+                            <i class="fas fa-circle text-success"></i> Connected
+                        </span>
+                        <button class="btn btn-outline-light btn-sm" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <div class="container-fluid p-4">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs mb-4" id="mainTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="toys-tab" data-bs-toggle="tab" data-bs-target="#toys" type="button" role="tab">
+                            <i class="fas fa-heart me-2"></i>Toys
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="control-tab" data-bs-toggle="tab" data-bs-target="#control" type="button" role="tab">
+                            <i class="fas fa-gamepad me-2"></i>Control
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="patterns-tab" data-bs-toggle="tab" data-bs-target="#patterns" type="button" role="tab">
+                            <i class="fas fa-wave-square me-2"></i>Patterns
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="testing-tab" data-bs-toggle="tab" data-bs-target="#testing" type="button" role="tab">
+                            <i class="fas fa-flask me-2"></i>Testing
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="mainTabContent">
+                    <!-- Toys Tab -->
+                    <div class="tab-pane fade show active" id="toys" role="tabpanel">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h4>Toy Library</h4>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-primary-custom btn-custom" onclick="showAddToyModal()">
+                                    <i class="fas fa-plus me-2"></i>Add Toy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <select class="form-select" id="manufacturerFilter" onchange="filterToys()">
+                                    <option value="">All Manufacturers</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="categoryFilter" onchange="filterToys()">
+                                    <option value="">All Categories</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilter" onchange="filterToys()">
+                                    <option value="">All Status</option>
+                                    <option value="connected">Connected</option>
+                                    <option value="disconnected">Disconnected</option>
+                                    <option value="error">Error</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="searchInput" placeholder="Search toys..." onkeyup="filterToys()">
+                            </div>
+                        </div>
+
+                        <!-- Toys Grid -->
+                        <div id="toysGrid" class="row">
+                            <!-- Toys will be loaded here -->
+                        </div>
+
+                        <div id="loadingSpinner" class="loading-spinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Control Tab -->
+                    <div class="tab-pane fade" id="control" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fas fa-gamepad me-2"></i>Toy Control</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Toy:</label>
+                                            <select class="form-select" id="controlToySelect">
+                                                <option value="">Choose a toy...</option>
+                                            </select>
+                                        </div>
+
+                                        <div id="controlPanel" style="display: none;">
+                                            <div class="mb-4">
+                                                <label class="form-label">Intensity: <span id="intensityValue">50</span>%</label>
+                                                <input type="range" class="intensity-slider" id="intensitySlider" min="0" max="100" value="50" oninput="updateIntensity(this.value)">
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label">Duration (seconds):</label>
+                                                <input type="number" class="form-control" id="durationInput" value="5" min="1" max="300">
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label class="form-label">Mode:</label>
+                                                <select class="form-select" id="modeSelect">
+                                                    <option value="constant">Constant</option>
+                                                    <option value="pulse">Pulse</option>
+                                                    <option value="wave">Wave</option>
+                                                    <option value="escalation">Escalation</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                                                <button class="btn btn-success btn-custom" onclick="sendCustomPattern()">
+                                                    <i class="fas fa-play me-2"></i>Send Pattern
+                                                </button>
+                                                <button class="btn btn-danger btn-custom" onclick="stopToy()">
+                                                    <i class="fas fa-stop me-2"></i>Stop
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fas fa-info-circle me-2"></i>Toy Status</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="toyStatusInfo">
+                                            <p class="text-muted">Select a toy to view status</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Patterns Tab -->
+                    <div class="tab-pane fade" id="patterns" role="tabpanel">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h4>Pattern Library</h4>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-primary-custom btn-custom" onclick="showCreatePatternModal()">
+                                    <i class="fas fa-plus me-2"></i>Create Pattern
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="patternsGrid" class="row">
+                            <!-- Patterns will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Testing Tab -->
+                    <div class="tab-pane fade" id="testing" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-flask me-2"></i>Toy Testing</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Select Toy:</label>
+                                            <select class="form-select" id="testToySelect">
+                                                <option value="">Choose a toy...</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Test Type:</label>
+                                            <select class="form-select" id="testTypeSelect">
+                                                <option value="connection">Connection Test</option>
+                                                <option value="functionality">Functionality Test</option>
+                                                <option value="pattern">Pattern Test</option>
+                                                <option value="stress">Stress Test</option>
+                                            </select>
+                                        </div>
+
+                                        <button class="btn btn-warning btn-custom" onclick="runTest()">
+                                            <i class="fas fa-play me-2"></i>Run Test
+                                        </button>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div id="testResults" class="test-results" style="display: none;">
+                                            <h6>Test Results:</h6>
+                                            <div id="testSteps"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Toy Modal -->
+    <div class="modal fade" id="addToyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Toy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addToyForm">
+                        <div class="mb-3">
+                            <label class="form-label">Name *</label>
+                            <input type="text" class="form-control" id="toyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Model</label>
+                            <input type="text" class="form-control" id="toyModel">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Manufacturer *</label>
+                            <select class="form-select" id="toyManufacturer" required>
+                                <option value="">Select manufacturer...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category *</label>
+                            <select class="form-select" id="toyCategory" required>
+                                <option value="">Select category...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Device ID *</label>
+                            <input type="text" class="form-control" id="toyDeviceId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Connection Type</label>
+                            <select class="form-select" id="toyConnectionType">
+                                <option value="api">API</option>
+                                <option value="bluetooth">Bluetooth</option>
+                                <option value="websocket">WebSocket</option>
+                                <option value="emulated">Emulated</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary-custom" onclick="addToy()">Add Toy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Pattern Modal -->
+    <div class="modal fade" id="createPatternModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-wave-square me-2"></i>Create Pattern</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createPatternForm">
+                        <div class="mb-3">
+                            <label class="form-label">Pattern Name *</label>
+                            <input type="text" class="form-control" id="patternName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="patternDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Pattern Type</label>
+                            <select class="form-select" id="patternType" onchange="updatePatternFields()">
+                                <option value="simple">Simple</option>
+                                <option value="wave">Wave</option>
+                                <option value="pulse">Pulse</option>
+                                <option value="escalation">Escalation</option>
+                                <option value="random">Random</option>
+                            </select>
+                        </div>
+                        <div id="patternFields">
+                            <!-- Pattern-specific fields will be added here -->
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Duration (ms)</label>
+                            <input type="number" class="form-control" id="patternDuration" value="5000" min="100">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="patternPublic">
+                            <label class="form-check-label" for="patternPublic">
+                                Make pattern public
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary-custom" onclick="createPattern()">Create Pattern</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                <!-- Toast message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

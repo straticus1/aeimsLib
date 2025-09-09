@@ -1,0 +1,25 @@
+# Configuration
+config.php
+
+# Logs
+/logs
+*.log
+
+# Dependencies
+/vendor
+node_modules
+
+# IDE/Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
