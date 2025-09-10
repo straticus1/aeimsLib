@@ -1,0 +1,124 @@
+{
+  "type": "vibrator",
+  "name": "Advanced Vibration Device",
+  "description": "High-precision vibration device with multiple control modes",
+  "version": "1.0.0",
+  "features": [
+    {
+      "id": "basic_control",
+      "name": "Basic Control",
+      "description": "Basic intensity control from 0-100%",
+      "parameters": [
+        {
+          "id": "intensity",
+          "name": "Intensity",
+          "type": "number",
+          "min": 0,
+          "max": 100,
+          "default": 0
+        }
+      ]
+    },
+    {
+      "id": "wave_pattern",
+      "name": "Wave Pattern",
+      "description": "Sinusoidal intensity pattern with configurable frequency",
+      "parameters": [
+        {
+          "id": "min_intensity",
+          "name": "Minimum Intensity",
+          "type": "number",
+          "min": 0,
+          "max": 100,
+          "default": 0
+        },
+        {
+          "id": "max_intensity",
+          "name": "Maximum Intensity",
+          "type": "number",
+          "min": 0,
+          "max": 100,
+          "default": 100
+        },
+        {
+          "id": "frequency",
+          "name": "Frequency (Hz)",
+          "type": "number",
+          "min": 0.1,
+          "max": 10,
+          "default": 1
+        }
+      ]
+    },
+    {
+      "id": "multi_motor",
+      "name": "Multi-Motor Control",
+      "description": "Independent control of multiple motors",
+      "experimental": true,
+      "parameters": [
+        {
+          "id": "motor_id",
+          "name": "Motor ID",
+          "type": "number",
+          "min": 1,
+          "max": 4
+        },
+        {
+          "id": "intensity",
+          "name": "Intensity",
+          "type": "number",
+          "min": 0,
+          "max": 100
+        }
+      ]
+    },
+    {
+      "id": "haptic_feedback",
+      "name": "Haptic Feedback",
+      "description": "Advanced haptic patterns with custom waveforms",
+      "experimental": true,
+      "requiresAuth": true,
+      "parameters": [
+        {
+          "id": "pattern",
+          "name": "Pattern Name",
+          "type": "string"
+        },
+        {
+          "id": "intensity",
+          "name": "Pattern Intensity",
+          "type": "number",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "id": "duration",
+          "name": "Duration (ms)",
+          "type": "number",
+          "min": 100,
+          "max": 10000
+        }
+      ]
+    }
+  ],
+  "pricing": {
+    "baseRate": 50,
+    "featureRates": {
+      "basic_control": 0,
+      "wave_pattern": 25,
+      "multi_motor": 75,
+      "haptic_feedback": 100
+    },
+    "currency": "USD",
+    "billingPeriod": "monthly",
+    "minimumCharge": 50,
+    "enterpriseDiscount": 0.2
+  },
+  "requirements": {
+    "minFirmware": "2.0.0",
+    "maxFirmware": "3.0.0",
+    "dependencies": [
+      "haptic_engine@1.0.0"
+    ]
+  }
+}
