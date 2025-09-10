@@ -82,6 +82,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance optimizations
 - Analytics system updates
 
+## [4.0.0] - 2025-09-10
+
+### 🌟 Added
+- XR/VR Integration:
+  - VR device synchronization
+  - Advanced haptic feedback
+  - 3D spatial control
+  - Mixed reality support
+  - Real-time sync
+- Haptic Features:
+  - Effect system
+  - Pattern generation
+  - Event processing
+  - Smoothing and ramping
+  - State management
+- Device Sync:
+  - High-performance sync
+  - Latency compensation
+  - Event buffering
+  - Error recovery
+  - State monitoring
+- Audio/Video Integration:
+  - Media synchronization
+  - Pattern extraction
+  - Beat detection
+  - Intensity mapping
+  - Real-time processing
+- Bluetooth Mesh:
+  - Device meshing
+  - Network topology
+  - Auto-routing
+  - Secure mesh
+
+### 🔧 Changed
+- Complete XR integration
+- Enhanced haptic system
+- Improved sync performance
+- Better media processing
+- Optimized mesh networking
+
+## [3.5.0] - 2025-09-10
+
+### 🌟 Added
+- Mobile Support:
+  - React Native integration
+  - iOS BLE optimizations
+  - Android BLE support
+  - Mobile UI components
+  - Device authentication
+- React Native Features:
+  - Device discovery and control
+  - Pattern management
+  - Real-time feedback
+  - Background operation
+  - Power management
+- BLE Optimizations:
+  - Connection pooling
+  - MTU optimization
+  - Power profiles
+  - Auto-reconnect
+  - State restoration
+- UI Components:
+  - Device cards
+  - Pattern controls
+  - Connection status
+  - Battery monitoring
+  - Error handling
+
+### 🔧 Changed
+- Improved Bluetooth stack
+- Enhanced connection management
+- Better device authentication
+- Optimized power consumption
+- Enhanced mobile UX
+
 ## [3.0.0] - 2025-09-10
 
 ### 🌟 Added
