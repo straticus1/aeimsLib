@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir, unlink, readdir, stat, rename } from 'fs/promises';
 import { join } from 'path';
 import { DeviceError, ErrorType } from '../errors/DeviceError';
 import { Device } from '../DeviceManager';

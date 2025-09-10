@@ -72,6 +72,10 @@ class API {
                     $this->handleControl($pathParts);
                     break;
                     
+                case 'system':
+                    $this->handleSystem($pathParts);
+                    break;
+                    
                 default:
                     $this->sendError('Invalid endpoint', 404);
             }
@@ -410,6 +414,59 @@ class API {
         http_response_code($status);
         echo json_encode(['error' => $message]);
         exit();
+    }
+    
+    /**
+     * Get API status and health information
+     */
+    public function getStatus() {
+        $status = [
+            'status' => 'healthy',
+            'timestamp' => date('c'),
+            'version' => '1.0.0',
+            'clients' => $this->deviceManager->getDeviceStatistics(),
+            'database' => $this->checkDatabaseHealth(),
+            'memory_usage' => memory_get_usage(true),
+            'uptime' => time() - $_SERVER['REQUEST_TIME_FLOAT']
+        ];
+        
+        return $status;
+    }
+    
+    /**
+     * Check database health
+     */
+    private function checkDatabaseHealth() {
+        try {
+            $this->db->query("SELECT 1");
+            return ['status' => 'connected', 'error' => null];
+        } catch (Exception $e) {
+            return ['status' => 'disconnected', 'error' => $e->getMessage()];
+        }
+    }
+    
+    /**
+     * Handle system endpoints
+     */
+    private function handleSystem($pathParts) {
+        switch ($_SERVER['REQUEST_METHOD']) {
+            case 'GET':
+                if (count($pathParts) === 1) {
+                    // GET /api/system/status
+                    $this->sendResponse($this->getStatus());
+                } elseif (count($pathParts) === 2 && $pathParts[1] === 'health') {
+                    // GET /api/system/health
+                    $health = $this->getStatus();
+                    $health['status'] = $health['database']['status'] === 'connected' ? 'healthy' : 'unhealthy';
+                    $this->sendResponse($health);
+                } else {
+                    $this->sendError('Invalid endpoint', 404);
+                }
+                break;
+                
+            default:
+                $this->sendError('Method not allowed', 405);
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { Device, DeviceCommand, DeviceStatus } from '../interfaces/device';
 import { Logger } from '../utils/Logger';
+import { DeviceManager } from '../core/DeviceManager';
 import { CommandProcessor } from './CommandProcessor';
 
 export interface DeviceState {
@@ -316,9 +317,13 @@ export class DeviceStateManager extends EventEmitter {
   }
 
   private async getDevice(deviceId: string): Promise<Device> {
-    // This should be implemented to retrieve the device instance
-    // Could be from a device registry or similar service
-    throw new Error('Not implemented');
+    try {
+      // Get device from device manager
+      const deviceManager = DeviceManager.getInstance();
+      return deviceManager.getDevice(deviceId);
+    } catch (error) {
+      throw new Error(`Failed to get device ${deviceId}: ${error.message}`);
+    }
   }
 
   getConfig(): StateRecoveryConfig {

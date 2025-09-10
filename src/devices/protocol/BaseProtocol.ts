@@ -333,20 +333,111 @@ export abstract class BaseProtocol extends EventEmitter implements ProtocolHandl
 
   // Optional compression methods
   protected async compress(data: Buffer): Promise<Buffer> {
-    throw new Error('Compression not implemented');
+    if (!this.capabilities.compression) {
+      return data;
+    }
+    
+    try {
+      const zlib = await import('zlib');
+      return new Promise((resolve, reject) => {
+        zlib.gzip(data, (err, compressed) => {
+          if (err) reject(err);
+          else resolve(compressed);
+        });
+      });
+    } catch (error) {
+      throw new ProtocolError(
+        ProtocolErrorType.ENCODING_FAILED,
+        'Compression failed',
+        error
+      );
+    }
   }
 
   protected async decompress(data: Buffer): Promise<Buffer> {
-    throw new Error('Decompression not implemented');
+    if (!this.capabilities.compression) {
+      return data;
+    }
+    
+    try {
+      const zlib = await import('zlib');
+      return new Promise((resolve, reject) => {
+        zlib.gunzip(data, (err, decompressed) => {
+          if (err) reject(err);
+          else resolve(decompressed);
+        });
+      });
+    } catch (error) {
+      throw new ProtocolError(
+        ProtocolErrorType.DECODING_FAILED,
+        'Decompression failed',
+        error
+      );
+    }
   }
 
   // Optional encryption methods
   protected async encrypt(data: Buffer): Promise<Buffer> {
-    throw new Error('Encryption not implemented');
+    if (!this.options.encryptionEnabled) {
+      return data;
+    }
+    
+    try {
+      const crypto = await import('crypto');
+      const algorithm = 'aes-256-gcm';
+      const key = crypto.randomBytes(32);
+      const iv = crypto.randomBytes(16);
+      
+      const cipher = crypto.createCipher(algorithm, key);
+      cipher.setAAD(Buffer.from('aeims-protocol', 'utf8'));
+      
+      let encrypted = cipher.update(data);
+      encrypted = Buffer.concat([encrypted, cipher.final()]);
+      
+      const authTag = cipher.getAuthTag();
+      
+      // Combine IV, authTag, and encrypted data
+      return Buffer.concat([iv, authTag, encrypted]);
+    } catch (error) {
+      throw new ProtocolError(
+        ProtocolErrorType.ENCODING_FAILED,
+        'Encryption failed',
+        error
+      );
+    }
   }
 
   protected async decrypt(data: Buffer): Promise<Buffer> {
-    throw new Error('Decryption not implemented');
+    if (!this.options.encryptionEnabled) {
+      return data;
+    }
+    
+    try {
+      const crypto = await import('crypto');
+      const algorithm = 'aes-256-gcm';
+      
+      // Extract IV, authTag, and encrypted data
+      const iv = data.slice(0, 16);
+      const authTag = data.slice(16, 32);
+      const encrypted = data.slice(32);
+      
+      const key = crypto.randomBytes(32); // In real implementation, use proper key management
+      
+      const decipher = crypto.createDecipher(algorithm, key);
+      decipher.setAAD(Buffer.from('aeims-protocol', 'utf8'));
+      decipher.setAuthTag(authTag);
+      
+      let decrypted = decipher.update(encrypted);
+      decrypted = Buffer.concat([decrypted, decipher.final()]);
+      
+      return decrypted;
+    } catch (error) {
+      throw new ProtocolError(
+        ProtocolErrorType.DECODING_FAILED,
+        'Decryption failed',
+        error
+      );
+    }
   }
 
   private validateOptions() {

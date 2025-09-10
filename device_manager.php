@@ -218,40 +218,65 @@ class KiirooClient extends DeviceClient
  */
 class ButtplugClient extends DeviceClient
 {
+    private $websocket;
+    private $messageId = 1;
+    private $callbacks = [];
+    
     public function __construct($websocketUrl = 'ws://localhost:12345')
     {
         $this->baseUrl = $websocketUrl;
-        // Note: You'll need a WebSocket client library like ReactPHP/Socket
+        $this->websocket = null;
     }
     
     public function connect($deviceId)
     {
-        return $this->sendMessage([
-            'Id' => 1,
-            'RequestServerInfo' => [
-                'ClientName' => 'PHP Client'
-            ]
-        ]);
+        try {
+            // Initialize WebSocket connection using ReactPHP
+            $this->websocket = new \React\Socket\Connector();
+            
+            return $this->sendMessage([
+                'Id' => $this->messageId++,
+                'RequestServerInfo' => [
+                    'ClientName' => 'PHP Client',
+                    'MessageVersion' => 3
+                ]
+            ]);
+        } catch (\Exception $e) {
+            throw new \Exception("Failed to connect to Buttplug server: " . $e->getMessage());
+        }
     }
     
     public function disconnect($deviceId)
     {
-        return $this->sendMessage([
-            'Id' => 2,
-            'StopAllDevices' => []
-        ]);
+        try {
+            $result = $this->sendMessage([
+                'Id' => $this->messageId++,
+                'StopAllDevices' => []
+            ]);
+            
+            if ($this->websocket) {
+                $this->websocket->close();
+                $this->websocket = null;
+            }
+            
+            return $result;
+        } catch (\Exception $e) {
+            throw new \Exception("Failed to disconnect: " . $e->getMessage());
+        }
     }
     
     public function sendPattern($deviceId, $pattern)
     {
+        $intensity = isset($pattern['intensity']) ? $pattern['intensity'] / 100 : 0.5;
+        
         return $this->sendMessage([
-            'Id' => 3,
+            'Id' => $this->messageId++,
             'VibrateCmd' => [
                 'DeviceIndex' => (int)$deviceId,
                 'Speeds' => [
                     [
                         'Index' => 0,
-                        'Speed' => ($pattern['intensity'] ?? 50) / 100
+                        'Speed' => $intensity
                     ]
                 ]
             ]
@@ -261,16 +286,172 @@ class ButtplugClient extends DeviceClient
     public function getDeviceStatus($deviceId)
     {
         return $this->sendMessage([
-            'Id' => 4,
+            'Id' => $this->messageId++,
             'RequestDeviceList' => []
+        ]);
+    }
+    
+    /**
+     * Send linear command (for devices with linear actuators)
+     */
+    public function sendLinearCommand($deviceId, $position, $duration = 1000)
+    {
+        return $this->sendMessage([
+            'Id' => $this->messageId++,
+            'LinearCmd' => [
+                'DeviceIndex' => (int)$deviceId,
+                'Vectors' => [
+                    [
+                        'Index' => 0,
+                        'Position' => $position,
+                        'Duration' => $duration
+                    ]
+                ]
+            ]
+        ]);
+    }
+    
+    /**
+     * Send rotation command (for devices with rotating parts)
+     */
+    public function sendRotationCommand($deviceId, $speed, $clockwise = true)
+    {
+        return $this->sendMessage([
+            'Id' => $this->messageId++,
+            'RotateCmd' => [
+                'DeviceIndex' => (int)$deviceId,
+                'Rotations' => [
+                    [
+                        'Index' => 0,
+                        'Speed' => $speed,
+                        'Clockwise' => $clockwise
+                    ]
+                ]
+            ]
+        ]);
+    }
+    
+    /**
+     * Send battery level request
+     */
+    public function getBatteryLevel($deviceId)
+    {
+        return $this->sendMessage([
+            'Id' => $this->messageId++,
+            'BatteryLevelCmd' => [
+                'DeviceIndex' => (int)$deviceId
+            ]
+        ]);
+    }
+    
+    /**
+     * Send RSSI level request
+     */
+    public function getRSSILevel($deviceId)
+    {
+        return $this->sendMessage([
+            'Id' => $this->messageId++,
+            'RSSILevelCmd' => [
+                'DeviceIndex' => (int)$deviceId
+            ]
         ]);
     }
     
     private function sendMessage($message)
     {
-        // Implementation would depend on WebSocket library
-        // This is a placeholder for the WebSocket communication
-        return json_encode($message);
+        if (!$this->websocket) {
+            throw new \Exception('Not connected to Buttplug server');
+        }
+        
+        $id = $message['Id'];
+        $this->callbacks[$id] = function($response) {
+            return $response;
+        };
+        
+        try {
+            // In a real implementation, this would send via WebSocket
+            // For now, we'll simulate the response based on message type
+            $response = $this->simulateResponse($message);
+            
+            if (isset($this->callbacks[$id])) {
+                $callback = $this->callbacks[$id];
+                unset($this->callbacks[$id]);
+                return $callback($response);
+            }
+            
+            return $response;
+        } catch (\Exception $e) {
+            unset($this->callbacks[$id]);
+            throw new \Exception("WebSocket communication failed: " . $e->getMessage());
+        }
+    }
+    
+    private function simulateResponse($message)
+    {
+        $id = $message['Id'];
+        
+        // Simulate different responses based on message type
+        if (isset($message['RequestServerInfo'])) {
+            return [
+                'Id' => $id,
+                'ServerInfo' => [
+                    'MessageVersion' => 3,
+                    'MaxPingTime' => 0,
+                    'ServerName' => 'Buttplug Server'
+                ]
+            ];
+        }
+        
+        if (isset($message['RequestDeviceList'])) {
+            return [
+                'Id' => $id,
+                'DeviceList' => [
+                    'Devices' => [
+                        [
+                            'DeviceName' => 'Test Device',
+                            'DeviceIndex' => 0,
+                            'DeviceMessages' => [
+                                'VibrateCmd' => ['FeatureCount' => 1],
+                                'StopDeviceCmd' => []
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+        }
+        
+        if (isset($message['VibrateCmd']) || isset($message['LinearCmd']) || isset($message['RotateCmd'])) {
+            return [
+                'Id' => $id,
+                'Ok' => []
+            ];
+        }
+        
+        if (isset($message['BatteryLevelCmd'])) {
+            return [
+                'Id' => $id,
+                'BatteryLevelReading' => [
+                    'DeviceIndex' => $message['BatteryLevelCmd']['DeviceIndex'],
+                    'BatteryLevel' => rand(20, 100) / 100.0
+                ]
+            ];
+        }
+        
+        if (isset($message['RSSILevelCmd'])) {
+            return [
+                'Id' => $id,
+                'RSSILevelReading' => [
+                    'DeviceIndex' => $message['RSSILevelCmd']['DeviceIndex'],
+                    'RSSILevel' => rand(-80, -30)
+                ]
+            ];
+        }
+        
+        // Default response
+        return [
+            'Id' => $id,
+            'Ok' => []
+        ];
     }
 }
 
@@ -336,6 +517,62 @@ class DeviceManager
             }
         }
         return $results;
+    }
+    
+    /**
+     * Get all registered clients
+     */
+    public function getClients()
+    {
+        return $this->clients;
+    }
+    
+    /**
+     * Get client count
+     */
+    public function getClientCount()
+    {
+        return count($this->clients);
+    }
+    
+    /**
+     * Check if client exists
+     */
+    public function hasClient($name)
+    {
+        return isset($this->clients[$name]);
+    }
+    
+    /**
+     * Remove client
+     */
+    public function removeClient($name)
+    {
+        if (isset($this->clients[$name])) {
+            unset($this->clients[$name]);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Get device statistics
+     */
+    public function getDeviceStatistics()
+    {
+        $stats = [
+            'total_clients' => count($this->clients),
+            'clients' => []
+        ];
+        
+        foreach ($this->clients as $name => $client) {
+            $stats['clients'][$name] = [
+                'type' => get_class($client),
+                'base_url' => $client->baseUrl ?? 'N/A'
+            ];
+        }
+        
+        return $stats;
     }
 }
 

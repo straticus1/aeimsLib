@@ -1,237 +1,304 @@
-import { DeviceTypeConfig } from './DeviceConfig';
-import { DeviceFeature, DevicePricing } from '../types/DeviceTypes';
+import { DeviceTypeConfig, DeviceFeature, DevicePricing } from './DeviceConfig';
 
-interface ValidationResult {
+/**
+ * Validation result interface
+ */
+export interface ValidationResult {
   valid: boolean;
   errors: string[];
+  warnings: string[];
 }
 
 /**
- * Validate device type configuration
+ * Validate device configuration
  */
 export function validateConfig(config: DeviceTypeConfig): ValidationResult {
   const errors: string[] = [];
+  const warnings: string[] = [];
 
-  // Basic field validation
-  validateRequiredFields(config, errors);
-  
-  // Feature validation
-  validateFeatures(config.features, errors);
-  
-  // Pricing validation
-  validatePricing(config.pricing, errors);
-  
-  // Version validation
-  validateVersion(config.version, errors);
+  // Validate basic fields
+  if (!config.type || typeof config.type !== 'string') {
+    errors.push('Device type is required and must be a string');
+  }
 
-  // Requirements validation if present
+  if (!config.name || typeof config.name !== 'string') {
+    errors.push('Device name is required and must be a string');
+  }
+
+  if (!config.description || typeof config.description !== 'string') {
+    errors.push('Device description is required and must be a string');
+  }
+
+  if (!config.version || typeof config.version !== 'string') {
+    errors.push('Device version is required and must be a string');
+  }
+
+  // Validate features
+  if (!Array.isArray(config.features)) {
+    errors.push('Features must be an array');
+  } else {
+    config.features.forEach((feature, index) => {
+      const featureErrors = validateFeature(feature, index);
+      errors.push(...featureErrors);
+    });
+  }
+
+  // Validate pricing
+  const pricingErrors = validatePricing(config.pricing);
+  errors.push(...pricingErrors);
+
+  // Validate requirements if present
   if (config.requirements) {
-    validateRequirements(config.requirements, errors);
+    const requirementsErrors = validateRequirements(config.requirements);
+    errors.push(...requirementsErrors);
   }
 
   return {
     valid: errors.length === 0,
-    errors
+    errors,
+    warnings
   };
 }
 
-function validateRequiredFields(config: DeviceTypeConfig, errors: string[]) {
-  const requiredFields = ['type', 'name', 'description', 'version', 'features', 'pricing'];
-  
-  for (const field of requiredFields) {
-    if (!config[field]) {
-      errors.push(`Missing required field: ${field}`);
-    }
+/**
+ * Validate device feature
+ */
+function validateFeature(feature: DeviceFeature, index: number): string[] {
+  const errors: string[] = [];
+
+  if (!feature.id || typeof feature.id !== 'string') {
+    errors.push(`Feature ${index}: ID is required and must be a string`);
   }
 
-  if (typeof config.type !== 'string' || config.type.length === 0) {
-    errors.push('Invalid type field');
+  if (!feature.name || typeof feature.name !== 'string') {
+    errors.push(`Feature ${index}: Name is required and must be a string`);
   }
 
-  if (typeof config.name !== 'string' || config.name.length === 0) {
-    errors.push('Invalid name field');
+  if (!feature.description || typeof feature.description !== 'string') {
+    errors.push(`Feature ${index}: Description is required and must be a string`);
   }
 
-  if (typeof config.description !== 'string' || config.description.length === 0) {
-    errors.push('Invalid description field');
+  // Validate parameters if present
+  if (feature.parameters && Array.isArray(feature.parameters)) {
+    feature.parameters.forEach((param, paramIndex) => {
+      const paramErrors = validateParameter(param, index, paramIndex);
+      errors.push(...paramErrors);
+    });
   }
+
+  return errors;
 }
 
-function validateFeatures(features: DeviceFeature[], errors: string[]) {
-  if (!Array.isArray(features)) {
-    errors.push('Features must be an array');
-    return;
+/**
+ * Validate feature parameter
+ */
+function validateParameter(param: any, featureIndex: number, paramIndex: number): string[] {
+  const errors: string[] = [];
+
+  if (!param.id || typeof param.id !== 'string') {
+    errors.push(`Feature ${featureIndex}, Parameter ${paramIndex}: ID is required and must be a string`);
   }
 
-  if (features.length === 0) {
-    errors.push('Device must have at least one feature');
-    return;
+  if (!param.name || typeof param.name !== 'string') {
+    errors.push(`Feature ${featureIndex}, Parameter ${paramIndex}: Name is required and must be a string`);
   }
 
-  const featureIds = new Set<string>();
+  if (!param.type || !['number', 'string', 'boolean'].includes(param.type)) {
+    errors.push(`Feature ${featureIndex}, Parameter ${paramIndex}: Type must be 'number', 'string', or 'boolean'`);
+  }
 
-  for (const feature of features) {
-    // Check required fields
-    if (!feature.id || typeof feature.id !== 'string') {
-      errors.push('Feature must have a valid ID');
-      continue;
+  // Validate min/max for number types
+  if (param.type === 'number') {
+    if (param.min !== undefined && typeof param.min !== 'number') {
+      errors.push(`Feature ${featureIndex}, Parameter ${paramIndex}: Min value must be a number`);
     }
-
-    if (!feature.name || typeof feature.name !== 'string') {
-      errors.push(`Feature ${feature.id} must have a valid name`);
+    if (param.max !== undefined && typeof param.max !== 'number') {
+      errors.push(`Feature ${featureIndex}, Parameter ${paramIndex}: Max value must be a number`);
     }
-
-    if (!feature.description || typeof feature.description !== 'string') {
-      errors.push(`Feature ${feature.id} must have a valid description`);
-    }
-
-    // Check for duplicate IDs
-    if (featureIds.has(feature.id)) {
-      errors.push(`Duplicate feature ID: ${feature.id}`);
-    }
-    featureIds.add(feature.id);
-
-    // Validate parameters if present
-    if (feature.parameters) {
-      if (!Array.isArray(feature.parameters)) {
-        errors.push(`Feature ${feature.id} parameters must be an array`);
-        continue;
-      }
-
-      const paramIds = new Set<string>();
-      for (const param of feature.parameters) {
-        if (!param.id || typeof param.id !== 'string') {
-          errors.push(`Feature ${feature.id} parameter must have a valid ID`);
-          continue;
-        }
-
-        if (!param.name || typeof param.name !== 'string') {
-          errors.push(`Feature ${feature.id} parameter ${param.id} must have a valid name`);
-        }
-
-        if (!param.type || !['number', 'string', 'boolean'].includes(param.type)) {
-          errors.push(`Feature ${feature.id} parameter ${param.id} must have a valid type`);
-        }
-
-        if (param.type === 'number') {
-          if (param.min !== undefined && typeof param.min !== 'number') {
-            errors.push(`Feature ${feature.id} parameter ${param.id} min must be a number`);
-          }
-          if (param.max !== undefined && typeof param.max !== 'number') {
-            errors.push(`Feature ${feature.id} parameter ${param.id} max must be a number`);
-          }
-          if (param.min !== undefined && param.max !== undefined && param.min > param.max) {
-            errors.push(`Feature ${feature.id} parameter ${param.id} min cannot be greater than max`);
-          }
-        }
-
-        // Check for duplicate parameter IDs
-        if (paramIds.has(param.id)) {
-          errors.push(`Feature ${feature.id} has duplicate parameter ID: ${param.id}`);
-        }
-        paramIds.add(param.id);
-      }
+    if (param.min !== undefined && param.max !== undefined && param.min > param.max) {
+      errors.push(`Feature ${featureIndex}, Parameter ${paramIndex}: Min value cannot be greater than max value`);
     }
   }
+
+  return errors;
 }
 
-function validatePricing(pricing: DevicePricing, errors: string[]) {
-  if (typeof pricing !== 'object') {
-    errors.push('Pricing must be an object');
-    return;
-  }
+/**
+ * Validate device pricing
+ */
+function validatePricing(pricing: DevicePricing): string[] {
+  const errors: string[] = [];
 
   if (typeof pricing.baseRate !== 'number' || pricing.baseRate < 0) {
-    errors.push('Pricing baseRate must be a non-negative number');
-  }
-
-  if (typeof pricing.featureRates !== 'object') {
-    errors.push('Pricing featureRates must be an object');
-    return;
-  }
-
-  for (const [feature, rate] of Object.entries(pricing.featureRates)) {
-    if (typeof rate !== 'number' || rate < 0) {
-      errors.push(`Pricing featureRate for ${feature} must be a non-negative number`);
-    }
+    errors.push('Base rate must be a non-negative number');
   }
 
   if (!pricing.currency || typeof pricing.currency !== 'string') {
-    errors.push('Pricing must have a valid currency');
+    errors.push('Currency is required and must be a string');
   }
 
-  if (!pricing.billingPeriod || 
-      !['hourly', 'daily', 'monthly'].includes(pricing.billingPeriod)) {
-    errors.push('Pricing must have a valid billingPeriod');
+  if (!pricing.billingPeriod || !['hourly', 'daily', 'monthly'].includes(pricing.billingPeriod)) {
+    errors.push('Billing period must be one of: hourly, daily, monthly');
   }
 
-  if (pricing.minimumCharge !== undefined && 
-      (typeof pricing.minimumCharge !== 'number' || pricing.minimumCharge < 0)) {
-    errors.push('Pricing minimumCharge must be a non-negative number');
+  if (!pricing.featureRates || typeof pricing.featureRates !== 'object') {
+    errors.push('Feature rates must be an object');
+  } else {
+    Object.entries(pricing.featureRates).forEach(([feature, rate]) => {
+      if (typeof rate !== 'number' || rate < 0) {
+        errors.push(`Feature rate for '${feature}' must be a non-negative number`);
+      }
+    });
   }
 
-  if (pricing.enterpriseDiscount !== undefined && 
-      (typeof pricing.enterpriseDiscount !== 'number' || 
-       pricing.enterpriseDiscount < 0 || 
-       pricing.enterpriseDiscount > 1)) {
-    errors.push('Pricing enterpriseDiscount must be a number between 0 and 1');
+  if (pricing.minimumCharge !== undefined && (typeof pricing.minimumCharge !== 'number' || pricing.minimumCharge < 0)) {
+    errors.push('Minimum charge must be a non-negative number');
   }
+
+  if (pricing.enterpriseDiscount !== undefined && (typeof pricing.enterpriseDiscount !== 'number' || pricing.enterpriseDiscount < 0 || pricing.enterpriseDiscount > 1)) {
+    errors.push('Enterprise discount must be a number between 0 and 1');
+  }
+
+  return errors;
 }
 
-function validateVersion(version: string, errors: string[]) {
-  if (!version || typeof version !== 'string') {
-    errors.push('Version must be a string');
-    return;
+/**
+ * Validate device requirements
+ */
+function validateRequirements(requirements: any): string[] {
+  const errors: string[] = [];
+
+  if (requirements.minFirmware !== undefined && typeof requirements.minFirmware !== 'string') {
+    errors.push('Minimum firmware version must be a string');
   }
 
-  // Validate semantic version format (major.minor.patch)
-  const versionRegex = /^\d+\.\d+\.\d+$/;
-  if (!versionRegex.test(version)) {
-    errors.push('Version must be in semantic version format (e.g., 1.0.0)');
-  }
-}
-
-function validateRequirements(requirements: any, errors: string[]) {
-  if (requirements.minFirmware && typeof requirements.minFirmware !== 'string') {
-    errors.push('Requirements minFirmware must be a string');
+  if (requirements.maxFirmware !== undefined && typeof requirements.maxFirmware !== 'string') {
+    errors.push('Maximum firmware version must be a string');
   }
 
-  if (requirements.maxFirmware && typeof requirements.maxFirmware !== 'string') {
-    errors.push('Requirements maxFirmware must be a string');
-  }
-
-  if (requirements.dependencies) {
+  if (requirements.dependencies !== undefined) {
     if (!Array.isArray(requirements.dependencies)) {
-      errors.push('Requirements dependencies must be an array');
+      errors.push('Dependencies must be an array');
     } else {
-      for (const dep of requirements.dependencies) {
+      requirements.dependencies.forEach((dep: any, index: number) => {
         if (typeof dep !== 'string') {
-          errors.push('Each dependency must be a string');
+          errors.push(`Dependency ${index} must be a string`);
         }
-      }
+      });
     }
   }
 
-  // Validate firmware version format if present
-  const firmwareRegex = /^\d+\.\d+\.\d+$/;
-  if (requirements.minFirmware && !firmwareRegex.test(requirements.minFirmware)) {
-    errors.push('Requirements minFirmware must be in semantic version format');
-  }
-  if (requirements.maxFirmware && !firmwareRegex.test(requirements.maxFirmware)) {
-    errors.push('Requirements maxFirmware must be in semantic version format');
-  }
+  return errors;
+}
 
-  // Validate min/max firmware relationship
-  if (requirements.minFirmware && requirements.maxFirmware) {
-    const min = requirements.minFirmware.split('.').map(Number);
-    const max = requirements.maxFirmware.split('.').map(Number);
-    
-    for (let i = 0; i < 3; i++) {
-      if (min[i] > max[i]) {
-        errors.push('Requirements minFirmware cannot be greater than maxFirmware');
-        break;
-      }
-      if (min[i] < max[i]) break;
+/**
+ * Validate device type string
+ */
+export function validateDeviceType(type: string): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!type || typeof type !== 'string') {
+    errors.push('Device type is required and must be a string');
+  } else {
+    // Check for valid characters (alphanumeric, underscore, hyphen)
+    if (!/^[a-zA-Z0-9_-]+$/.test(type)) {
+      errors.push('Device type can only contain alphanumeric characters, underscores, and hyphens');
+    }
+
+    // Check length
+    if (type.length < 2) {
+      errors.push('Device type must be at least 2 characters long');
+    }
+
+    if (type.length > 50) {
+      errors.push('Device type must be no more than 50 characters long');
+    }
+
+    // Check for reserved names
+    const reservedNames = ['system', 'admin', 'root', 'config', 'test', 'default'];
+    if (reservedNames.includes(type.toLowerCase())) {
+      warnings.push('Device type name is reserved and may cause conflicts');
     }
   }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
+ * Validate device ID
+ */
+export function validateDeviceId(id: string): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!id || typeof id !== 'string') {
+    errors.push('Device ID is required and must be a string');
+  } else {
+    // Check for valid characters
+    if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
+      errors.push('Device ID can only contain alphanumeric characters, underscores, and hyphens');
+    }
+
+    // Check length
+    if (id.length < 3) {
+      errors.push('Device ID must be at least 3 characters long');
+    }
+
+    if (id.length > 100) {
+      errors.push('Device ID must be no more than 100 characters long');
+    }
+
+    // Check for reserved patterns
+    if (id.startsWith('_') || id.endsWith('_')) {
+      warnings.push('Device ID should not start or end with underscore');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
+}
+
+/**
+ * Validate device name
+ */
+export function validateDeviceName(name: string): ValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  if (!name || typeof name !== 'string') {
+    errors.push('Device name is required and must be a string');
+  } else {
+    // Check length
+    if (name.length < 1) {
+      errors.push('Device name cannot be empty');
+    }
+
+    if (name.length > 200) {
+      errors.push('Device name must be no more than 200 characters long');
+    }
+
+    // Check for excessive whitespace
+    if (name.trim() !== name) {
+      warnings.push('Device name should not have leading or trailing whitespace');
+    }
+
+    // Check for multiple consecutive spaces
+    if (/\s{2,}/.test(name)) {
+      warnings.push('Device name should not have multiple consecutive spaces');
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings
+  };
 }

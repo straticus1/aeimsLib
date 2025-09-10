@@ -1,13 +1,15 @@
 {
   "type": "vibrator",
-  "name": "Advanced Vibration Device",
-  "description": "High-precision vibration device with multiple control modes",
+  "name": "Generic Vibrator",
+  "description": "A generic vibrator device with basic vibration control",
   "version": "1.0.0",
   "features": [
     {
-      "id": "basic_control",
-      "name": "Basic Control",
-      "description": "Basic intensity control from 0-100%",
+      "id": "vibration",
+      "name": "Vibration Control",
+      "description": "Control vibration intensity and patterns",
+      "experimental": false,
+      "requiresAuth": false,
       "parameters": [
         {
           "id": "intensity",
@@ -15,110 +17,78 @@
           "type": "number",
           "min": 0,
           "max": 100,
-          "default": 0
+          "default": 50
+        },
+        {
+          "id": "pattern",
+          "name": "Pattern",
+          "type": "string",
+          "default": "constant"
+        },
+        {
+          "id": "duration",
+          "name": "Duration",
+          "type": "number",
+          "min": 100,
+          "max": 60000,
+          "default": 1000
         }
       ]
     },
     {
-      "id": "wave_pattern",
-      "name": "Wave Pattern",
-      "description": "Sinusoidal intensity pattern with configurable frequency",
-      "parameters": [
-        {
-          "id": "min_intensity",
-          "name": "Minimum Intensity",
-          "type": "number",
-          "min": 0,
-          "max": 100,
-          "default": 0
-        },
-        {
-          "id": "max_intensity",
-          "name": "Maximum Intensity",
-          "type": "number",
-          "min": 0,
-          "max": 100,
-          "default": 100
-        },
-        {
-          "id": "frequency",
-          "name": "Frequency (Hz)",
-          "type": "number",
-          "min": 0.1,
-          "max": 10,
-          "default": 1
-        }
-      ]
+      "id": "battery_monitoring",
+      "name": "Battery Monitoring",
+      "description": "Monitor device battery level",
+      "experimental": false,
+      "requiresAuth": false
     },
     {
-      "id": "multi_motor",
-      "name": "Multi-Motor Control",
-      "description": "Independent control of multiple motors",
-      "experimental": true,
-      "parameters": [
-        {
-          "id": "motor_id",
-          "name": "Motor ID",
-          "type": "number",
-          "min": 1,
-          "max": 4
-        },
-        {
-          "id": "intensity",
-          "name": "Intensity",
-          "type": "number",
-          "min": 0,
-          "max": 100
-        }
-      ]
+      "id": "connection_status",
+      "name": "Connection Status",
+      "description": "Monitor device connection status",
+      "experimental": false,
+      "requiresAuth": false
     },
     {
-      "id": "haptic_feedback",
-      "name": "Haptic Feedback",
-      "description": "Advanced haptic patterns with custom waveforms",
+      "id": "advanced_patterns",
+      "name": "Advanced Patterns",
+      "description": "Support for complex vibration patterns",
       "experimental": true,
       "requiresAuth": true,
       "parameters": [
         {
-          "id": "pattern",
-          "name": "Pattern Name",
-          "type": "string"
+          "id": "pattern_type",
+          "name": "Pattern Type",
+          "type": "string",
+          "default": "wave"
         },
         {
-          "id": "intensity",
-          "name": "Pattern Intensity",
+          "id": "frequency",
+          "name": "Frequency",
           "type": "number",
-          "min": 0,
-          "max": 100
-        },
-        {
-          "id": "duration",
-          "name": "Duration (ms)",
-          "type": "number",
-          "min": 100,
-          "max": 10000
+          "min": 0.1,
+          "max": 10.0,
+          "default": 1.0
         }
       ]
     }
   ],
   "pricing": {
-    "baseRate": 50,
+    "baseRate": 0.10,
     "featureRates": {
-      "basic_control": 0,
-      "wave_pattern": 25,
-      "multi_motor": 75,
-      "haptic_feedback": 100
+      "vibration": 0.05,
+      "battery_monitoring": 0.01,
+      "connection_status": 0.01,
+      "advanced_patterns": 0.20
     },
     "currency": "USD",
-    "billingPeriod": "monthly",
-    "minimumCharge": 50,
-    "enterpriseDiscount": 0.2
+    "billingPeriod": "hourly",
+    "minimumCharge": 0.01,
+    "enterpriseDiscount": 0.15
   },
   "requirements": {
-    "minFirmware": "2.0.0",
-    "maxFirmware": "3.0.0",
-    "dependencies": [
-      "haptic_engine@1.0.0"
-    ]
+    "minFirmware": "1.0.0",
+    "maxFirmware": "2.0.0",
+    "dependencies": ["bluetooth", "battery_sensor"]
   }
 }

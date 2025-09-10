@@ -14,6 +14,7 @@ import { register, Counter, Gauge, Histogram, Summary } from 'prom-client';
 import { WebSocketStats } from '../interfaces/websocket';
 import { DeviceManager } from '../device/DeviceManager';
 import { Logger } from '../utils/Logger';
+import { AnalyticsCollector, AnalyticsEventType } from './AnalyticsCollector';
 import os from 'os';
 
 export class DefaultMonitoringService implements MonitoringService {
@@ -254,8 +255,54 @@ export class DefaultMonitoringService implements MonitoringService {
   }
 
   async getSessionMetrics(sessionId: string): Promise<SessionMetrics> {
-    // This should be implemented based on your session tracking
-    throw new Error('Not implemented');
+    try {
+      // Get session data from analytics collector
+      const analytics = AnalyticsCollector.getInstance();
+      const sessionEvents = analytics.queryEvents({
+        sessionIds: [sessionId],
+        startTime: Date.now() - 3600000 // Last hour
+      });
+
+      const deviceEvents = sessionEvents.filter(event => 
+        event.type === AnalyticsEventType.COMMAND_COMPLETED ||
+        event.type === AnalyticsEventType.DEVICE_CONNECTED ||
+        event.type === AnalyticsEventType.DEVICE_DISCONNECTED
+      );
+
+      const totalCommands = deviceEvents.filter(event => 
+        event.type === AnalyticsEventType.COMMAND_COMPLETED
+      ).length;
+
+      const successfulCommands = deviceEvents.filter(event => 
+        event.type === AnalyticsEventType.COMMAND_COMPLETED && 
+        event.data?.success === true
+      ).length;
+
+      const connectedDevices = new Set(
+        deviceEvents
+          .filter(event => event.type === AnalyticsEventType.DEVICE_CONNECTED)
+          .map(event => event.deviceId)
+      ).size;
+
+      const averageLatency = deviceEvents
+        .filter(event => event.type === AnalyticsEventType.COMMAND_COMPLETED && event.data?.duration)
+        .reduce((sum, event) => sum + (event.data.duration || 0), 0) / totalCommands || 0;
+
+      return {
+        sessionId,
+        totalCommands,
+        successfulCommands,
+        errorRate: totalCommands > 0 ? (totalCommands - successfulCommands) / totalCommands : 0,
+        averageLatency,
+        connectedDevices,
+        sessionDuration: 0, // Would need session start/end tracking
+        featuresUsed: [], // Would need feature usage tracking
+        lastActivity: new Date()
+      };
+    } catch (error) {
+      this.logger.error('Failed to get session metrics', { sessionId, error: error.message });
+      throw new Error(`Failed to get session metrics: ${error.message}`);
+    }
   }
 
   async checkHealth(): Promise<SystemHealth> {

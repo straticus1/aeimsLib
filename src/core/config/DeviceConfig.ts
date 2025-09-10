@@ -1,4 +1,4 @@
-import { readFile } from 'fs/promises';
+import { readFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import { DeviceFeature, DevicePricing } from '../types/DeviceTypes';
 import { validateConfig } from './validation';

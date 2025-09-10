@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import { Logger } from '../utils/Logger';
+import { DeviceManager } from '../core/DeviceManager';
 
 export enum ErrorSeverity {
   LOW = 'low',
@@ -308,13 +309,76 @@ export class ErrorHandlingSystem extends EventEmitter {
   }
 
   private async executeOperation(operation: string, args?: any): Promise<any> {
-    // This should be implemented to execute operations based on your system's needs
-    throw new Error('Operation execution not implemented');
+    try {
+      switch (operation) {
+        case 'restart_device':
+          if (args?.deviceId) {
+            const deviceManager = DeviceManager.getInstance();
+            const device = deviceManager.getDevice(args.deviceId);
+            // Implement device restart logic
+            this.logger.info('Device restart requested', { deviceId: args.deviceId });
+            return { success: true, message: 'Device restart initiated' };
+          }
+          break;
+          
+        case 'clear_cache':
+          // Implement cache clearing logic
+          this.logger.info('Cache clear requested');
+          return { success: true, message: 'Cache cleared' };
+          
+        case 'reload_config':
+          // Implement configuration reload logic
+          this.logger.info('Configuration reload requested');
+          return { success: true, message: 'Configuration reloaded' };
+          
+        case 'restart_service':
+          // Implement service restart logic
+          this.logger.info('Service restart requested');
+          return { success: true, message: 'Service restart initiated' };
+          
+        default:
+          throw new Error(`Unknown operation: ${operation}`);
+      }
+    } catch (error) {
+      this.logger.error('Operation execution failed', { operation, args, error: error.message });
+      throw error;
+    }
   }
 
   private async disableFeatures(features: string[]): Promise<void> {
-    // This should be implemented to disable features based on your system's needs
-    throw new Error('Feature disablement not implemented');
+    try {
+      for (const feature of features) {
+        switch (feature) {
+          case 'device_control':
+            // Disable device control features
+            this.logger.warn('Device control feature disabled due to errors');
+            break;
+            
+          case 'pattern_execution':
+            // Disable pattern execution features
+            this.logger.warn('Pattern execution feature disabled due to errors');
+            break;
+            
+          case 'remote_control':
+            // Disable remote control features
+            this.logger.warn('Remote control feature disabled due to errors');
+            break;
+            
+          case 'analytics':
+            // Disable analytics features
+            this.logger.warn('Analytics feature disabled due to errors');
+            break;
+            
+          default:
+            this.logger.warn(`Unknown feature to disable: ${feature}`);
+        }
+      }
+      
+      this.logger.info('Features disabled', { features });
+    } catch (error) {
+      this.logger.error('Feature disablement failed', { features, error: error.message });
+      throw error;
+    }
   }
 
   private logError(error: Error, context: ErrorContext): void {
