@@ -4,13 +4,20 @@ AeimsLib is a comprehensive TypeScript/JavaScript library for integrating with v
 
 ## 🌟 Features
 
-- **Multiple Device Protocols**:
+- Multiple Device Protocols:
   - Lovense
   - WeVibe/WowTech
   - Kiiroo
   - Magic Motion
   - Generic BLE devices
   - Buttplug.io protocol
+  - Experimental Devices (Beta):
+    - Svakom
+    - Vorze
+    - XInput/DirectInput Gamepads
+    - Handy/Stroker
+    - OSR/OpenSexRouter
+    - MaxPro/Max2
 - **Real-time Control**:
   - WebSocket-based device control
   - Pattern-based control system

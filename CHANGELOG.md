@@ -5,6 +5,35 @@ All notable changes to aeimsLib will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-09-11
+
+### 🌟 Added
+- Comprehensive monitoring system:
+  - Real-time metrics collection with multiple metric types
+  - Event-based analytics and device tracking
+  - Usage statistics and performance monitoring
+  - HTTP API endpoints for standalone use
+  - AEIMS platform integration
+
+- Experimental device support (Beta):
+  - Svakom devices
+  - Vorze A10 Cyclone
+  - XInput/DirectInput gamepads
+  - Handy/Stroker devices
+  - OSR/OpenSexRouter integration
+  - MaxPro/Max2 devices
+
+### 🔧 Changed
+- Enhanced device manager with monitoring integration
+- Improved pattern system with analytics
+- Better error tracking and reporting
+
+### 🐞 Fixed
+- Pattern timing accuracy
+- Connection stability improvements
+- Memory management in monitoring system
+- Session tracking reliability
+
 ## [2.0.0] - 2025-09-10
 
 ### 🌟 Added

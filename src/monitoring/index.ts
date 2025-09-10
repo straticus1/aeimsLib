@@ -6,6 +6,7 @@ import {
   DeviceUsageStats,
   AnalyticsSnapshot
 } from './AnalyticsCollector';
+import { DeviceManager } from '../devices/DeviceManager';
 
 export {
   // Metrics exports
@@ -24,9 +25,72 @@ export {
 /**
  * Initialize monitoring system with default configuration.
  */
-export function initializeMonitoring(): void {
+export interface MonitoringOptions {
+  deviceManager?: DeviceManager;
+  aeims?: any; // AEIMS platform client
+  syncInterval?: number; // ms
+}
+
+export function initializeMonitoring(options: MonitoringOptions = {}): void {
   const metrics = MetricsCollector.getInstance();
   const analytics = AnalyticsCollector.getInstance();
+  
+  // Register standard metrics
+  metrics.registerStandardMetrics();
+  
+  // Set up device monitoring if manager provided
+  if (options.deviceManager) {
+    const manager = options.deviceManager;
+    
+    manager.on('deviceConnected', device => {
+      const monitor = new DeviceMonitoring(device.info.id);
+      monitor.onConnect();
+    });
+    
+    manager.on('deviceDisconnected', device => {
+      const monitor = new DeviceMonitoring(device.info.id);
+      monitor.onDisconnect();
+    });
+    
+    manager.on('deviceCommand', ({ device, command, success, error, duration }) => {
+      const monitor = new DeviceMonitoring(device.info.id);
+      if (success) {
+        monitor.onCommandComplete(command.type, duration, true);
+      } else {
+        monitor.onCommandComplete(command.type, duration, false, error);
+      }
+    });
+    
+    manager.on('deviceError', ({ device, error, context }) => {
+      const monitor = new DeviceMonitoring(device.info.id);
+      monitor.onError(error, context);
+    });
+  }
+  
+  // Set up AEIMS platform integration if client provided
+  if (options.aeims) {
+    const syncInterval = options.syncInterval || 60000; // Default 1 minute
+    
+    // Periodic sync of metrics and analytics
+    setInterval(() => {
+      const snapshot = analytics.getSnapshot();
+      options.aeims.sendAnalytics(snapshot);
+      
+      const metricData = metrics.getMetrics();
+      options.aeims.sendMetrics(metricData);
+    }, syncInterval);
+    
+    // Handle platform events
+    options.aeims.on('sessionStart', ({ sessionId, userId }) => {
+      const session = new SessionMonitoring(sessionId, userId);
+      session.start();
+    });
+    
+    options.aeims.on('sessionEnd', ({ sessionId, userId }) => {
+      const session = new SessionMonitoring(sessionId, userId);
+      session.end();
+    });
+  }
 
   // Register standard metrics
   metrics.registerStandardMetrics();
@@ -88,6 +152,28 @@ export function shutdownMonitoring(): void {
 /**
  * Helper class to simplify monitoring integration in device-related code.
  */
+// Cache monitoring instances
+const deviceMonitors = new Map<string, DeviceMonitoring>();
+const sessionMonitors = new Map<string, SessionMonitoring>();
+
+export function getDeviceMonitor(deviceId: string): DeviceMonitoring {
+  let monitor = deviceMonitors.get(deviceId);
+  if (!monitor) {
+    monitor = new DeviceMonitoring(deviceId);
+    deviceMonitors.set(deviceId, monitor);
+  }
+  return monitor;
+}
+
+export function getSessionMonitor(sessionId: string, userId?: string): SessionMonitoring {
+  let monitor = sessionMonitors.get(sessionId);
+  if (!monitor) {
+    monitor = new SessionMonitoring(sessionId, userId);
+    sessionMonitors.set(sessionId, monitor);
+  }
+  return monitor;
+}
+
 export class DeviceMonitoring {
   private deviceId: string;
   private metrics: MetricsCollector;
