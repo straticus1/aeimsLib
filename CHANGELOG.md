@@ -82,6 +82,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance optimizations
 - Analytics system updates
 
+## [2.3.0] - 2025-09-10
+
+### 🌟 Added
+- WebSocket Performance Enhancements:
+  - Connection pooling with health checks
+  - Automatic connection management
+  - Message batching and compression
+  - Connection state caching
+  - Performance monitoring
+- WebSocket Reliability:
+  - Automatic health checks
+  - Connection replacement
+  - Idle connection management
+  - Error rate tracking
+
+### 🔧 Changed
+- Enhanced WebSocket manager with zlib compression
+- Improved connection handling and recovery
+- Better message batching and queuing
+- Optimized connection lifecycle
+
 ## [2.2.0] - 2025-09-10
 
 ### 🌟 Added

@@ -82,6 +82,14 @@ AeimsLib is a comprehensive TypeScript/JavaScript library for integrating with v
   - Data encryption
   - Secure storage
   - Activity logging
+- **Performance**:
+  - Connection pooling
+  - Message batching
+  - Compression (zlib)
+  - State caching
+  - Auto-scaling pools
+  - Health monitoring
+  - Performance tracking
 - **Monitoring**:
   - Real-time metrics
   - Health checks
