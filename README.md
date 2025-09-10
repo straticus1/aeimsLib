@@ -24,7 +24,7 @@ AeimsLib is a comprehensive TypeScript/JavaScript library for integrating with v
     - Vibease
     - Satisfyer Connect
     - Hicoo/Hi-Link
-- LoveLife Krush/Apex
+    - LoveLife Krush/Apex
 
 🚀 Upcoming Features (2025 Q3-Q4):
 
