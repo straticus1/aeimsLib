@@ -82,6 +82,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance optimizations
 - Analytics system updates
 
+## [2.5.0] - 2025-09-10
+
+### 🌟 Added
+- Developer Tools Suite:
+  - Pattern Playground GUI
+  - Performance Profiler
+  - Device Simulator enhancements
+  - Protocol Analysis tools
+  - Test Framework expansions
+- Pattern Playground Features:
+  - Real-time visualization
+  - Pattern editing
+  - Preview generation
+  - Export functionality
+  - Telemetry integration
+- Performance Profiler Features:
+  - Detailed metrics collection
+  - Anomaly detection
+  - Performance recommendations
+  - Resource monitoring
+  - Battery impact analysis
+- Testing Enhancements:
+  - Pattern accuracy testing
+  - Latency analysis
+  - Resource utilization
+  - Battery simulation
+  - Stress testing
+
+### 🔧 Changed
+- Enhanced development workflow
+- Improved testing infrastructure
+- Better debugging tools
+- Expanded telemetry integration
+
+## [2.4.0] - 2025-09-10
+
+### 🌟 Added
+- Enhanced Security System:
+  - Identity verification service with MFA support
+  - OAuth2 authentication with PKCE
+  - Advanced rate limiting (fixed/sliding/token bucket)
+  - Comprehensive audit logging
+  - Secure event storage and querying
+- Identity Features:
+  - Multiple verification methods
+  - Challenge-based verification
+  - Token management
+  - MFA support
+- OAuth2 Features:
+  - Multiple grant types
+  - PKCE support
+  - Token refresh
+  - User info endpoint
+- Rate Limiting:
+  - Multiple algorithms
+  - Dynamic rules
+  - Automatic blocking
+  - Recovery options
+- Audit System:
+  - Secure event storage
+  - Event querying
+  - Retention management
+  - Event archival
+
+### 🔧 Changed
+- Enhanced security service architecture
+- Improved token management
+- Better rate limit handling
+- Enhanced audit trail integration
+
 ## [2.3.0] - 2025-09-10
 
 ### 🌟 Added

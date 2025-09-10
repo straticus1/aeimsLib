@@ -54,6 +54,8 @@ AeimsLib is a comprehensive TypeScript/JavaScript library for integrating with v
 
 - Developer Tools:
   - Pattern Designer GUI
+  - Pattern Playground GUI
+  - Performance Profiler
   - Device Simulator
   - Protocol Analyzer
   - VS Code Extension
@@ -77,11 +79,17 @@ AeimsLib is a comprehensive TypeScript/JavaScript library for integrating with v
 - **Security**:
   - HTTPS/WSS encryption
   - JWT authentication
-  - Rate limiting
+  - OAuth2 with PKCE
+  - MFA support
+  - Advanced rate limiting
   - Input validation
   - Data encryption
   - Secure storage
-  - Activity logging
+  - Challenge-based verification
+  - Comprehensive audit trails
+  - Token management
+  - Automatic blocking
+  - Event archival
 - **Performance**:
   - Connection pooling
   - Message batching
