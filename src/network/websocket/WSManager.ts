@@ -599,13 +599,22 @@ export class WSManager extends EventEmitter {
   }
 
   private compress(data: Buffer): Buffer {
-    // Implement compression
-    return data;
+    // Use zlib deflate for compression
+    const zlib = require('zlib');
+    return zlib.deflateSync(data, {
+      level: zlib.constants.Z_BEST_SPEED
+    });
   }
 
   private decompress(data: Buffer): Buffer {
-    // Implement decompression
-    return data;
+    // Use zlib inflate for decompression
+    const zlib = require('zlib');
+    return zlib.inflateSync(data);
+  }
+
+  private shouldDecompress(data: Buffer): boolean {
+    // Check first byte for zlib header
+    return data.length > 0 && (data[0] === 0x78 || data[0] === 0x58);
   }
 
   private isResponse(message: any): boolean {
