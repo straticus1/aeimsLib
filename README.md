@@ -18,6 +18,13 @@ AeimsLib is a comprehensive TypeScript/JavaScript library for integrating with v
     - Handy/Stroker
     - OSR/OpenSexRouter
     - MaxPro/Max2
+    - PiShock (Electrostimulation)
+    - TCode Protocol Devices
+    - Bluetooth TENS Units
+    - Vibease
+    - Satisfyer Connect
+    - Hicoo/Hi-Link
+    - LoveLife Krush/Apex
 - **Real-time Control**:
   - WebSocket-based device control
   - Pattern-based control system

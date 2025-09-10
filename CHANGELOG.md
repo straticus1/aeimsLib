@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.1.0] - 2025-09-11
 
 ### 🌟 Added
+- Additional experimental device support:
+  - PiShock (electrostimulation)
+  - TCode protocol devices
+  - Bluetooth TENS units
+  - Vibease devices
+  - Satisfyer Connect devices
+  - Hicoo/Hi-Link devices
+  - LoveLife Krush/Apex
+
 - Comprehensive monitoring system:
   - Real-time metrics collection with multiple metric types
   - Event-based analytics and device tracking

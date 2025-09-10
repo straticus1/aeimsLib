@@ -506,6 +506,8 @@ export class HandyDevice extends ExperimentalDevice {
   }
 }
 
+export * from './additional';
+
 // Device factory function
 export async function createExperimentalDevice(
   type: string,
