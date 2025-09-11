@@ -109,11 +109,19 @@ const logger: WinstonLogger = winston.createLogger({
 
 // Add request context to logs
 class Logger {
+  private static instance: Logger;
   private logger: WinstonLogger;
   private context: Record<string, unknown> = {};
 
-  constructor() {
+  private constructor() {
     this.logger = logger;
+  }
+
+  static getInstance(): Logger {
+    if (!Logger.instance) {
+      Logger.instance = new Logger();
+    }
+    return Logger.instance;
   }
 
   // Add contextual information to all subsequent logs
@@ -165,13 +173,13 @@ class Logger {
 
   // Create a child logger with additional context
   public child(context: Record<string, unknown>): Logger {
-    const childLogger = new Logger();
+    const childLogger = Logger.getInstance();
     childLogger.setContext({ ...this.context, ...context });
     return childLogger;
   }
 }
 
 // Create a default logger instance
-export const defaultLogger = new Logger();
+export const defaultLogger = Logger.getInstance();
 
 export default Logger;

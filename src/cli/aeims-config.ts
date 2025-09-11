@@ -3,7 +3,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import ora from 'ora';
 import { ConfigManager } from './ConfigManager';
-import { Logger } from '../utils/Logger';
+import Logger from '../utils/Logger';
 
 const program = new Command();
 const logger = Logger.getInstance();

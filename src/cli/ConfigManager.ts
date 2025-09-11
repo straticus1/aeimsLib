@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import { DeviceManager } from '../device/DeviceManager';
 import { DefaultSecurityService } from '../security/SecurityService';
 import { DefaultMonitoringService } from '../monitoring/MonitoringService';
-import { Logger } from '../utils/Logger';
+import Logger from '../utils/Logger';
 import { validate } from './ConfigValidator';
 
 interface ConfigResult {

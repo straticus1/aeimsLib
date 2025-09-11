@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import WebSocket from 'ws';
 import { SecurityService } from '../interfaces/security';
-import { Logger } from '../utils/Logger';
+import Logger from '../utils/Logger';
 
 export interface WebSocketConfig {
   url: string;

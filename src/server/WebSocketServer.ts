@@ -216,15 +216,21 @@ export class WebSocketServer extends EventEmitter {
   private checkRateLimit(ws: AuthenticatedWebSocket): boolean {
     const now = Date.now();
     
+    // Initialize rate limit properties if not set
+    if (ws.rateLimitWindow === undefined || ws.rateLimitCount === undefined) {
+      ws.rateLimitWindow = now;
+      ws.rateLimitCount = 0;
+    }
+    
     // Reset window if needed
-    if (now - ws.rateLimitWindow! > this.rateLimitConfig.windowMs) {
+    if (now - ws.rateLimitWindow > this.rateLimitConfig.windowMs) {
       ws.rateLimitWindow = now;
       ws.rateLimitCount = 0;
     }
 
-    ws.rateLimitCount!++;
+    ws.rateLimitCount++;
     
-    return ws.rateLimitCount! <= this.rateLimitConfig.max;
+    return ws.rateLimitCount <= this.rateLimitConfig.max;
   }
 
   private async handlePing(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
