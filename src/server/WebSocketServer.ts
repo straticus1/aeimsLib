@@ -37,6 +37,7 @@ export interface AuthenticatedWebSocket extends WebSocket {
   lastActivity?: Date;
   rateLimitCount?: number;
   rateLimitWindow?: number;
+  deviceEventHandlers?: Map<string, (event: any) => void>;
 }
 
 export class WebSocketServer extends EventEmitter {
@@ -126,6 +127,7 @@ export class WebSocketServer extends EventEmitter {
     ws.lastActivity = new Date();
     ws.rateLimitCount = 0;
     ws.rateLimitWindow = Date.now();
+    ws.deviceEventHandlers = new Map();
 
     const clientId = `${ws.userId}-${ws.sessionId}`;
     this.clients.set(clientId, ws);
@@ -284,8 +286,8 @@ export class WebSocketServer extends EventEmitter {
   private async handleDeviceSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { deviceId } = message.payload;
     
-    // Subscribe to device events
-    this.deviceManager.on('deviceEvent', (event) => {
+    // Create event handler
+    const handler = (event: any) => {
       if (event.deviceId === deviceId) {
         this.sendMessage(ws, {
           id: this.generateMessageId(),
@@ -294,7 +296,15 @@ export class WebSocketServer extends EventEmitter {
           timestamp: Date.now()
         });
       }
-    });
+    };
+    
+    // Store handler reference for cleanup
+    if (ws.deviceEventHandlers) {
+      ws.deviceEventHandlers.set(deviceId, handler);
+    }
+    
+    // Subscribe to device events
+    this.deviceManager.on('deviceEvent', handler);
 
     this.sendMessage(ws, {
       id: message.id,
@@ -305,11 +315,21 @@ export class WebSocketServer extends EventEmitter {
   }
 
   private async handleDeviceUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
-    // Implementation would remove specific listeners
+    const { deviceId } = message.payload;
+    
+    // Remove specific listener if it exists
+    if (ws.deviceEventHandlers && ws.deviceEventHandlers.has(deviceId)) {
+      const handler = ws.deviceEventHandlers.get(deviceId);
+      if (handler) {
+        this.deviceManager.removeListener('deviceEvent', handler);
+        ws.deviceEventHandlers.delete(deviceId);
+      }
+    }
+    
     this.sendMessage(ws, {
       id: message.id,
       type: 'unsubscription_success',
-      payload: { deviceId: message.payload.deviceId },
+      payload: { deviceId },
       timestamp: Date.now()
     });
   }
@@ -338,6 +358,14 @@ export class WebSocketServer extends EventEmitter {
     if (pingInterval) {
       clearInterval(pingInterval);
       this.pingIntervals.delete(ws);
+    }
+    
+    // Clean up device event handlers to prevent memory leaks
+    if (ws.deviceEventHandlers) {
+      for (const [deviceId, handler] of ws.deviceEventHandlers.entries()) {
+        this.deviceManager.removeListener('deviceEvent', handler);
+      }
+      ws.deviceEventHandlers.clear();
     }
 
     this.logger.info('WebSocket client disconnected', {
