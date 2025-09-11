@@ -218,3 +218,4 @@ export function formatBatteryLevel(level: number): string {
     return `${level}% (Low)`;
   }
 }
+

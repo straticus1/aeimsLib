@@ -234,3 +234,4 @@ export class DuplicateDeviceError extends DeviceError {
 export {
   ErrorType
 };
+

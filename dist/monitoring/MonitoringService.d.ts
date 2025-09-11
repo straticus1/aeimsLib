@@ -1,0 +1,31 @@
+import { MonitoringService, MonitoringConfig, SystemHealth, PerformanceMetrics, DeviceMetrics, SessionMetrics, Alert, MetricLabels } from '../interfaces/monitoring';
+import { DeviceManager } from '../device/DeviceManager';
+export declare class DefaultMonitoringService implements MonitoringService {
+    private static instance;
+    private config;
+    private logger;
+    private deviceManager;
+    private collectionInterval?;
+    private metrics;
+    private alerts;
+    private constructor();
+    static getInstance(deviceManager: DeviceManager): DefaultMonitoringService;
+    initialize(config: MonitoringConfig): Promise<void>;
+    private setupDefaultMetrics;
+    private createMetric;
+    startMetricsCollection(): void;
+    stopMetricsCollection(): void;
+    private collectMetrics;
+    recordMetric(name: string, value: number, labels?: MetricLabels): void;
+    getMetrics(): Promise<PerformanceMetrics>;
+    getDeviceMetrics(deviceId: string): Promise<DeviceMetrics>;
+    getSessionMetrics(sessionId: string): Promise<SessionMetrics>;
+    checkHealth(): Promise<SystemHealth>;
+    triggerAlert(alert: Alert): Promise<void>;
+    acknowledgeAlert(alertId: string): Promise<void>;
+    getActiveAlerts(): Promise<Alert[]>;
+    private sendAlertNotification;
+    private calculateErrorRate;
+    private getWebSocketStats;
+    private checkHealthThresholds;
+}
