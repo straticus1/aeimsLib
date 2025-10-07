@@ -5,6 +5,85 @@ All notable changes to aeimsLib will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2025-10-07
+
+### 🌟 Added
+- **Enhanced WebSocket Server**: Complete WebSocket infrastructure upgrade
+  - ReactPHP WebSocket server implementation
+  - Robust WebSocket client with auto-reconnection
+  - Real-time device communication and control
+  - WebSocket-based device telemetry and monitoring
+- **AI Pattern Enhancement**: Advanced pattern generation system
+  - AIPatternEnhancer with machine learning integration
+  - Pattern optimization and personalization
+  - Dynamic pattern adaptation based on user preferences
+  - Enhanced pattern factory with AI-driven generation
+- **Configuration Management System**: Comprehensive configuration handling
+  - ConfigManager with YAML and JSON support
+  - Device configuration templates and profiles
+  - Environment-specific configuration management
+  - CLI-based configuration management tools
+- **Enhanced Device Management**: Improved device control and monitoring
+  - Updated DeviceManager with better connection handling
+  - Device type definitions and feature mapping
+  - Enhanced device state management and tracking
+  - Improved device pricing and mode configurations
+- **Analytics and Telemetry**: Advanced data collection and analysis
+  - AnalyticsProcessor for real-time device analytics
+  - MetricsCollector for comprehensive system metrics
+  - Enhanced logging system with structured logging
+  - Performance monitoring and optimization tools
+- **Server Infrastructure**: Complete server architecture overhaul
+  - EnhancedWebSocketServer with clustering support
+  - Security enhancements for server communications
+  - Performance optimizations for high-load scenarios
+  - Comprehensive error handling and recovery
+
+### 🔧 Changed
+- **TypeScript Migration**: Enhanced TypeScript support and development
+  - Updated TypeScript compiler configurations
+  - Enhanced type definitions for all device interfaces
+  - Improved development workflow with better type safety
+  - Updated build and compilation processes
+- **Docker Configuration**: Streamlined containerization
+  - Dockerfile improvements for better build performance
+  - Dockerfile.simple for development environments
+  - Enhanced .dockerignore for optimized builds
+  - Improved container networking and service discovery
+- **Package Management**: Updated dependencies and build system
+  - Updated package.json with latest dependencies
+  - Enhanced npm scripts for development workflow
+  - Improved lock file management and consistency
+  - Updated build tools and development dependencies
+- **Database Integration**: Enhanced database connectivity
+  - Updated database.php with improved connection handling
+  - Better error recovery and connection pooling
+  - Enhanced PostgreSQL integration support
+  - Improved database configuration management
+
+### 🛠️ Enhanced
+- **Development Tools**: Improved development experience
+  - Enhanced CLI tools with better user interface
+  - Improved logging and debugging capabilities
+  - Better error messages and development feedback
+  - Enhanced testing and validation tools
+- **Performance**: Optimized system performance
+  - Enhanced WebSocket connection management
+  - Improved device communication protocols
+  - Better memory management and resource utilization
+  - Optimized pattern processing and execution
+- **Security**: Strengthened security measures
+  - Enhanced authentication for device connections
+  - Improved encryption for device communications
+  - Better session management and security tokens
+  - Enhanced access control and permissions
+
+### 📦 Technical Improvements
+- **Code Quality**: Enhanced code organization and maintainability
+- **Documentation**: Updated documentation and examples
+- **Testing**: Improved test coverage and validation
+- **Deployment**: Streamlined deployment processes and automation
+
 ## [4.0.0] - 2025-10-15 (Planned)
 
 ### 🌟 Added
