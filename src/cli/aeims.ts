@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { program } from 'commander';
+import { Command } from 'commander';
+const program = new Command();
 import chalk from 'chalk';
 import ora from 'ora';
 import { DeviceManager } from '../core/DeviceManager';

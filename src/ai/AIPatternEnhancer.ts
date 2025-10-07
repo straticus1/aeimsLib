@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { Pattern } from '../patterns/Pattern';
-import { DeviceManager } from '../core/DeviceManager';
+import { DeviceManager } from '../device/DeviceManager';
 import { TelemetryManager } from '../core/telemetry/TelemetryManager';
 import { AnalyticsProcessor } from '../core/telemetry/AnalyticsProcessor';
 
@@ -325,7 +325,15 @@ export class AIPatternEnhancer extends EventEmitter {
     constraints: any
   ): Promise<Pattern> {
     // Generate pattern using ML model (placeholder)
-    return new Pattern();
+    return {
+      id: 'generated-' + Date.now(),
+      name: 'AI Generated Pattern',
+      type: 'constant' as any,
+      duration: 5000,
+      intensity: 50,
+      parameters: {},
+      getFeatures: () => ['ai-generated']
+    };
   }
 
   private async enhancePattern(
@@ -413,7 +421,7 @@ export class AIPatternEnhancer extends EventEmitter {
 
     if (constraints.allowedFeatures) {
       // Check if pattern only uses allowed features
-      const patternFeatures = pattern.getFeatures();
+      const patternFeatures = pattern.getFeatures?.() || [];
       return patternFeatures.every(f => 
         constraints.allowedFeatures!.includes(f)
       );

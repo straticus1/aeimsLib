@@ -250,4 +250,13 @@ export class AnalyticsProcessor {
     // For now, return mock count
     return 1000;
   }
+
+  /**
+   * Get user pattern history
+   */
+  getUserPatternHistory(userId: string): any[] {
+    // This would normally fetch from storage/database
+    // For now, return mock data
+    return [];
+  }
 }

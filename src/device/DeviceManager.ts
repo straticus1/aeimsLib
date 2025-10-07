@@ -237,4 +237,36 @@ export class DeviceManager extends EventEmitter {
     // Forward event to listeners
     this.emit('deviceEvent', event);
   }
+
+  getPattern(patternId: string): ControlPattern | undefined {
+    return this.patterns.get(patternId);
+  }
+
+  async startPattern(deviceId: string, pattern: ControlPattern): Promise<void> {
+    const device = this.getDevice(deviceId);
+    const protocol = this.protocols.get(device.info.protocol);
+
+    if (!protocol) {
+      throw new Error(`No protocol handler for ${device.info.protocol}`);
+    }
+
+    // Store pattern
+    this.patterns.set(pattern.name, pattern);
+
+    // Send pattern command to device
+    const command: DeviceCommand = {
+      type: 'pattern',
+      intensity: pattern.getIntensity(Date.now()),
+      pattern: pattern.name
+    };
+
+    await protocol.sendCommand(command);
+
+    // Update device state
+    device.currentPattern = pattern.name;
+    device.currentIntensity = command.intensity;
+    this.devices.set(deviceId, device);
+
+    this.logger.info(`Pattern ${pattern.name} started on device ${deviceId}`);
+  }
 }

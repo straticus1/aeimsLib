@@ -564,15 +564,77 @@ class DeviceManager
             'total_clients' => count($this->clients),
             'clients' => []
         ];
-        
+
         foreach ($this->clients as $name => $client) {
             $stats['clients'][$name] = [
                 'type' => get_class($client),
                 'base_url' => $client->baseUrl ?? 'N/A'
             ];
         }
-        
+
         return $stats;
+    }
+
+    /**
+     * Get list of supported device brands
+     */
+    public function getSupportedDevices()
+    {
+        return [
+            'Lovense', 'WeVibe', 'Kiiroo', 'Magic Motion', 'Svakom',
+            'Vorze', 'Handy', 'PiShock', 'Satisfyer', 'Vibease',
+            'LoveLife', 'TCode Protocol', 'Buttplug Protocol'
+        ];
+    }
+
+    /**
+     * Scan for available devices (simulated)
+     */
+    public function scanDevices()
+    {
+        return [
+            [
+                'id' => 'device_001',
+                'name' => 'Test Device 1',
+                'type' => 'vibrator',
+                'brand' => 'Lovense',
+                'connected' => false
+            ],
+            [
+                'id' => 'device_002',
+                'name' => 'Test Device 2',
+                'type' => 'sleeve',
+                'brand' => 'Kiiroo',
+                'connected' => false
+            ]
+        ];
+    }
+
+    /**
+     * Connect to a device (simulated)
+     */
+    public function connectDevice($deviceId)
+    {
+        // In real implementation, this would connect to actual device
+        return true;
+    }
+
+    /**
+     * Send command to device (simulated)
+     */
+    public function sendCommand($deviceId, $command, $params = [])
+    {
+        // In real implementation, this would send command to actual device
+        return ['success' => true, 'command' => $command, 'params' => $params];
+    }
+
+    /**
+     * Disconnect from device (simulated)
+     */
+    public function disconnectDevice($deviceId)
+    {
+        // In real implementation, this would disconnect from actual device
+        return true;
     }
 }
 

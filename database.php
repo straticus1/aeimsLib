@@ -3,15 +3,15 @@
 class Database {
     private $pdo;
     
-    public function __construct($host, $dbname, $user, $password) {
+    public function __construct($host, $dbname, $user, $password, $port = 5432) {
         try {
-            $dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";
+            $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false
             ];
-            
+
             $this->pdo = new PDO($dsn, $user, $password, $options);
         } catch (PDOException $e) {
             throw new Exception("Database connection failed: " . $e->getMessage());
@@ -126,9 +126,9 @@ class Database {
     public function getToys($userId) {
         return $this->query("
             SELECT t.*,
-                   CASE 
+                   CASE
                        WHEN t.last_connected IS NULL THEN 'disconnected'
-                       WHEN TIMESTAMPDIFF(MINUTE, t.last_connected, NOW()) > 5 THEN 'disconnected'
+                       WHEN EXTRACT(EPOCH FROM (NOW() - t.last_connected))/60 > 5 THEN 'disconnected'
                        ELSE 'connected'
                    END as status
             FROM toys t

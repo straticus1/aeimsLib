@@ -8,14 +8,14 @@ const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const js_yaml_1 = __importDefault(require("js-yaml"));
 const inquirer_1 = __importDefault(require("inquirer"));
-const Logger_1 = require("../utils/Logger");
+const Logger_1 = __importDefault(require("../utils/Logger"));
 const ConfigValidator_1 = require("./ConfigValidator");
 class ConfigManager {
     constructor() {
         this.CONFIG_DIR = '.aeims';
         this.CONFIG_FILE = 'config.yml';
         this.TEMPLATES_DIR = 'templates';
-        this.logger = Logger_1.Logger.getInstance();
+        this.logger = Logger_1.default.getInstance();
     }
     get configPath() {
         return path_1.default.join(process.env.HOME || process.env.USERPROFILE || '', this.CONFIG_DIR);

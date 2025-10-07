@@ -8,9 +8,9 @@ const commander_1 = require("commander");
 const chalk_1 = __importDefault(require("chalk"));
 const ora_1 = __importDefault(require("ora"));
 const ConfigManager_1 = require("./ConfigManager");
-const Logger_1 = require("../utils/Logger");
+const Logger_1 = __importDefault(require("../utils/Logger"));
 const program = new commander_1.Command();
-const logger = Logger_1.Logger.getInstance();
+const logger = Logger_1.default.getInstance();
 const config = new ConfigManager_1.ConfigManager();
 program
     .name('aeims-config')

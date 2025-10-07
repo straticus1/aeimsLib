@@ -38,7 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultLogger = void 0;
 const winston_1 = __importStar(require("winston"));
-require("winston-daily-rotate-file");
+const winston_daily_rotate_file_1 = __importDefault(require("winston-daily-rotate-file"));
 const uuid_1 = require("uuid");
 const os_1 = __importDefault(require("os"));
 const { combine, timestamp, printf, colorize, json } = winston_1.format;
@@ -94,7 +94,7 @@ const createTransports = () => {
     ];
     // File transport for production
     if (process.env.NODE_ENV === 'production') {
-        transportList.push(new winston_1.transports.DailyRotateFile({
+        transportList.push(new winston_daily_rotate_file_1.default({
             filename: 'logs/application-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
             zippedArchive: true,

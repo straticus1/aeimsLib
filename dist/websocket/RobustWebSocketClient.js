@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RobustWebSocketClient = exports.WebSocketEvent = void 0;
 const events_1 = require("events");
 const ws_1 = __importDefault(require("ws"));
-const Logger_1 = require("../utils/Logger");
+const Logger_1 = __importDefault(require("../utils/Logger"));
 var WebSocketEvent;
 (function (WebSocketEvent) {
     WebSocketEvent["CONNECTING"] = "connecting";
@@ -50,7 +50,7 @@ class RobustWebSocketClient extends events_1.EventEmitter {
             reconnectAttempts: 0,
             heartbeatMissed: 0
         };
-        this.logger = Logger_1.Logger.getInstance();
+        this.logger = Logger_1.default.getInstance();
     }
     async connect() {
         if (this.ws?.readyState === ws_1.default.OPEN ||

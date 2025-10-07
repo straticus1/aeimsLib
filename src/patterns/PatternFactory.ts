@@ -7,6 +7,7 @@ import {
   ControlPattern
 } from '../interfaces/patterns';
 
+import { BasePattern } from './BasePattern';
 import { ConstantPattern } from './ConstantPattern';
 import { WavePattern } from './WavePattern';
 import { PulsePattern } from './PulsePattern';
@@ -179,3 +180,7 @@ export class DefaultPatternFactory implements PatternFactory {
     return config;
   }
 }
+
+// Export the factory instance for easy access
+export const PatternFactory = DefaultPatternFactory.getInstance();
+export { DefaultPatternFactory };

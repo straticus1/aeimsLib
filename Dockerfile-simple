@@ -1,0 +1,69 @@
+# AEIMS Device Control Library - Simplified Node.js Docker Container
+# Ubuntu-compatible containerized server for device control WebSocket API
+
+FROM ubuntu:22.04
+
+# Prevent interactive prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Node.js and system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    nginx \
+    supervisor \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /app
+
+# Copy package files
+COPY package-simple.json package.json
+COPY server.js .
+
+# Create directories
+RUN mkdir -p logs data
+
+# Install Node.js dependencies
+RUN npm install --only=production
+
+# Create non-root user for Ubuntu
+RUN groupadd -g 1001 aeims \
+    && useradd -u 1001 -g aeims -m -s /bin/bash aeims \
+    && chown -R aeims:aeims /app
+
+# Copy nginx configuration for Ubuntu
+RUN mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+RUN echo "server { listen 80; location / { proxy_pass http://localhost:8080; } }" > /etc/nginx/sites-available/aeims-lib
+RUN ln -sf /etc/nginx/sites-available/aeims-lib /etc/nginx/sites-enabled/ \
+    && rm -f /etc/nginx/sites-enabled/default
+
+# Copy supervisor configuration
+RUN printf "[supervisord]\nnodaemon=true\n\n[program:aeims-lib]\ncommand=node /app/server.js\nuser=aeims\nautorestart=true\nstdout_logfile=/app/logs/aeims-lib.log\nstderr_logfile=/app/logs/aeims-lib-error.log\n\n[program:nginx]\ncommand=nginx -g 'daemon off;'\nautorestart=true\n" > /etc/supervisor/conf.d/supervisord.conf
+
+# Set proper permissions
+RUN chown -R aeims:aeims /app
+
+# Expose WebSocket port and HTTP port
+EXPOSE 8080 80
+
+# Health check for Ubuntu nginx integration
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Environment variables
+ENV NODE_ENV=production
+ENV WEBSOCKET_PORT=8080
+ENV LOG_LEVEL=info
+
+# Create health endpoint for load balancers
+RUN mkdir -p /var/www/html && \
+    echo '{"status":"healthy","service":"aeimsLib-simple","timestamp":"'$(date -Iseconds)'","version":"2.0.0"}' > /var/www/html/health
+
+# Use supervisor to manage services
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

@@ -190,10 +190,10 @@ class WebSocketButtplugClient extends ButtplugClient {
     
     public function __construct($websocketUrl) {
         parent::__construct($websocketUrl);
-        $this->connect();
+        // Don't auto-connect in constructor - let caller decide when to connect
     }
     
-    public function connect() {
+    public function connect($deviceId = null) {
         $this->conn = new \WebSocket\Client($this->baseUrl);
         
         // Request server info
@@ -204,6 +204,11 @@ class WebSocketButtplugClient extends ButtplugClient {
                 'MessageVersion' => 3
             ]
         ]);
+        
+        // If specific device ID provided, store it
+        if ($deviceId !== null) {
+            $this->currentDeviceId = $deviceId;
+        }
     }
     
     public function disconnect($deviceId) {

@@ -1,4 +1,3 @@
-import 'winston-daily-rotate-file';
 declare class Logger {
     private static instance;
     private logger;

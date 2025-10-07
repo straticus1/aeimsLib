@@ -1,0 +1,6 @@
+project:
+  domain_keywords: ["websocket", "device-control", "typescript", "aeims"]
+  prefer:
+    language: "typescript"
+    vector: null
+    db: null

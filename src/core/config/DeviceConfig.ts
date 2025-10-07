@@ -4,6 +4,9 @@ import { DeviceFeature, DevicePricing } from '../types/DeviceTypes';
 import { validateConfig } from './validation';
 import { DeviceError, ErrorType } from '../errors/DeviceError';
 
+// Re-export types for external use
+export { DeviceFeature, DevicePricing };
+
 /**
  * Device configuration interface
  */
@@ -71,14 +74,14 @@ export class DeviceConfig {
    */
   static async getAvailableDeviceTypes(): Promise<string[]> {
     try {
-      const files = await readFile(this.configPath);
+      const files = await readdir(this.configPath);
       return files
         .filter(file => file.endsWith('.json'))
         .map(file => file.replace('.json', ''));
     } catch (error) {
       throw new DeviceError(
         ErrorType.CONFIGURATION_ERROR,
-        `Failed to list device configurations: ${error.message}`
+        `Failed to list device configurations: ${(error as Error).message}`
       );
     }
   }

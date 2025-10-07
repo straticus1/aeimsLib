@@ -1,5 +1,5 @@
 import winston, { format, transports, Logger as WinstonLogger } from 'winston';
-import 'winston-daily-rotate-file';
+import DailyRotateFile from 'winston-daily-rotate-file';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
 import { TransformableInfo } from 'logform';
@@ -69,7 +69,7 @@ const createTransports = () => {
   // File transport for production
   if (process.env.NODE_ENV === 'production') {
     transportList.push(
-      new transports.DailyRotateFile({
+      new DailyRotateFile({
         filename: 'logs/application-%DATE%.log',
         datePattern: 'YYYY-MM-DD',
         zippedArchive: true,

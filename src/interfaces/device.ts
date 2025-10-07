@@ -47,11 +47,64 @@ export interface DeviceInfo {
  * Complete device interface
  */
 export interface Device {
+  id: string;
+  name: string;
+  type: string;
+  mode: string;
   info: DeviceInfo;
   status: DeviceStatus;
   settings: DeviceSettings;
+  state: DeviceState;
+  features: DeviceFeatures;
+  pricing: DevicePricing;
   currentPattern?: string;
   currentIntensity?: number;
+}
+
+/**
+ * Device state tracking
+ */
+export interface DeviceState {
+  connected: boolean;
+  active: boolean;
+  lastActivity: Date;
+  errorState?: string;
+}
+
+/**
+ * Device features configuration
+ */
+export interface DeviceFeatures {
+  id: string;
+  name: string;
+  description: string;
+  experimental?: boolean;
+  requiresAuth?: boolean;
+  vibration: boolean;
+  rotation: boolean;
+  heating: boolean;
+  patterns: string[];
+  parameters?: {
+    id: string;
+    name: string;
+    type: 'number' | 'string' | 'boolean';
+    min?: number;
+    max?: number;
+    default?: any;
+  }[];
+}
+
+/**
+ * Device pricing information
+ */
+export interface DevicePricing {
+  baseRate: number;
+  featureRates: Record<string, number>;
+  currency: string;
+  billingModel: string;
+  billingPeriod: 'hourly' | 'daily' | 'monthly';
+  minimumCharge?: number;
+  enterpriseDiscount?: number;
 }
 
 /**
